@@ -1,0 +1,20 @@
+﻿@model IEnumerable<Demo.Models.User>
+@{
+}
+
+<h3>User Details</h3>
+@{
+    var user = Model;
+}
+@foreach (var u in user)
+{
+    @u.name
+    <br />
+
+    @u.address
+    <br />
+
+    @u.email
+    <br />
+    <br />
+}
