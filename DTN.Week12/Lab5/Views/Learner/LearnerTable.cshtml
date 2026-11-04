@@ -1,25 +1,29 @@
-@model IEnumerable<Learner>
-
+﻿@model IEnumerable<Learner>
 <table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Mã</th>
-            <th>Tên</th>
-            <th>Họ</th>
-            <th>Ngành</th>
-            <th>Ngày nhập học</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var learner in Model)
-        {
-            <tr>
-                <td>@learner.LearnerID</td>
-                <td>@learner.FirstMidName</td>
-                <td>@learner.LastName</td>
-                <td>@learner.Major.MajorName</td>
-                <td>@learner.EnrollmentDate.ToString("dd/MM/yyyy")</td>
-            </tr>
-        }
-    </tbody>
+	<thead>
+		<tr>
+			<th>Mã</th>
+			<th>Tên</th>
+			<th>Họ</th>
+			<th>Ngành</th>
+			<th>Ngày nhập học</th>
+			<th>Chức năng</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var s in Model)
+		{
+			<tr>
+				<td>@s.LearnerID</td>
+				<td>@s.FirstMidName</td>
+				<td>@s.LastName</td>
+				<td>@s.Major.MajorName</td>
+				<td>@s.EnrollmentDate</td>
+				<td>
+					<a asp-action="Edit" asp-route-id="@s.LearnerID">Edit</a>|
+					<a asp-action="Delete" asp-route-id="@s.LearnerID">Delete</a>
+				</td>
+			</tr>
+		}
+	</tbody>
 </table>

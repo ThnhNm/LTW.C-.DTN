@@ -1,3 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+using Lab5.Data;
+using Lab5.Models;
+
 namespace Lab5
 {
     public class Program
@@ -6,11 +10,19 @@ namespace Lab5
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddDbContext<SchoolContext>(options => options
+            .UseSqlServer(builder.Configuration.GetConnectionString("SchoolContext")));
+
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-            builder.Services.AddSingleton<Lab5.Data.SchoolContext>();
 
             var app = builder.Build();
+
+            using(var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                DbInitalizer.Initialize(services);
+            }
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
@@ -21,6 +33,7 @@ namespace Lab5
             }
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
             app.UseRouting();
 
             app.UseAuthorization();

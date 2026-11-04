@@ -1,12 +1,21 @@
+﻿using Microsoft.AspNetCore.Mvc;
 using Lab5.Data;
-using Microsoft.AspNetCore.Mvc;
+using Lab5.Models;
 
-namespace Lab5.ViewComponents;
-
-public class MajorViewComponent(SchoolContext db) : ViewComponent
+namespace Lab5.ViewComponents
 {
-    public IViewComponentResult Invoke()
+    public class MajorViewComponent : ViewComponent
     {
-        return View("RenderMajor", db.Majors);
+        SchoolContext db;
+        List<Major> majors;
+        public MajorViewComponent(SchoolContext _context)
+        {
+            db = _context;
+            majors = db.Majors.ToList();
+        }
+        public async Task<IViewComponentResult> InvokeAsync()
+        {
+            return View("RenderMajor", majors);
+        }
     }
 }

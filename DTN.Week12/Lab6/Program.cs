@@ -1,3 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+using Lab6.Data;
+using Lab6.Models;
+
 namespace Lab6
 {
     public class Program
@@ -6,11 +10,19 @@ namespace Lab6
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddDbContext<SchoolContext>(options => options
+            .UseSqlServer(builder.Configuration.GetConnectionString("SchoolContext")));
+
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-            builder.Services.AddSingleton<Lab6.Data.SchoolContext>();
 
             var app = builder.Build();
+
+            using(var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                DbInitalizer.Initialize(services);
+            }
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
@@ -21,6 +33,7 @@ namespace Lab6
             }
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
             app.UseRouting();
 
             app.UseAuthorization();
@@ -28,11 +41,10 @@ namespace Lab6
             app.MapStaticAssets();
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Learner}/{action=Index}/{id?}")
+                pattern: "{controller=Home}/{action=Index}/{id?}")
                 .WithStaticAssets();
 
             app.Run();
         }
     }
 }
-

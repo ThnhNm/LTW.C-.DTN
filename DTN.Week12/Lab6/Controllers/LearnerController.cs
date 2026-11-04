@@ -1,110 +1,168 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Lab6.Data;
 using Lab6.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Validation;
 
-namespace Lab6.Controllers;
-
-public class LearnerController(SchoolContext db) : Controller
+namespace Lab6.Controllers
 {
-    private const int PageSize = 3;
-
-    [HttpGet]
-    public IActionResult Index(int? mid, string? keyword, int? pageIndex)
+    public class LearnerController : Controller
     {
-        return View(GetLearnerPage(mid, keyword, pageIndex));
-    }
-
-    [HttpGet]
-    public IActionResult LearnerFilter(int? mid, string? keyword, int? pageIndex)
-    {
-        return PartialView("LearnerTable", GetLearnerPage(mid, keyword, pageIndex));
-    }
-
-    [HttpGet]
-    public IActionResult Edit(int id)
-    {
-        var learner = db.Find(id);
-        if (learner is null)
+        private SchoolContext db;
+        private int pageSize = 3;
+        public LearnerController(SchoolContext context)
         {
-            return NotFound();
+            db = context;
+        }
+        public IActionResult Index(int? mid)
+        {
+            var learners = (IQueryable<Learner>)db.Learners.Include(m => m.Major);
+            if (mid != null)
+            {
+                learners = (IQueryable<Learner>)db.Learners.Where(l => l.MajorID == mid).Include(m => m.Major);
+            }
+            int pageNum = (int)Math.Ceiling(learners.Count() / (float)pageSize);
+            ViewBag.pageNum = pageNum;
+            var result = learners.Take(pageSize).ToList();
+            return View(result);
         }
 
-        ViewBag.MajorID = new SelectList(db.Majors, "MajorID", "MajorName", learner.MajorID);
-        return View(learner);
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public IActionResult Edit(int id, string firstMidName, string lastName, int majorID, DateOnly enrollmentDate)
-    {
-        var original = db.Find(id);
-        if (original is null)
+        public IActionResult LearnerFilter(int? mid, string? keyword, int? pageIndex)
         {
-            return NotFound();
+            var learners = (IQueryable<Learner>)db.Learners;
+            int page = (int)(pageIndex == null || pageIndex <= 0 ? 1 : pageIndex);
+            if (mid != null)
+            {
+                learners = learners.Where(l => l.MajorID == mid);
+                ViewBag.mid = mid;
+            }
+            if (keyword != null)
+            {
+                learners = learners.Where(l => l.FirstMidName.ToLower().Contains(keyword.ToLower()));
+                ViewBag.keyword = keyword;
+            }
+            int pageNum = (int)Math.Ceiling(learners.Count() / (float)pageSize);
+            ViewBag.pageNum = pageNum;
+            var result = learners.Skip(pageSize * (page - 1)).Take(pageSize).Include(m => m.Major);
+            return PartialView("LearnerTable", result);
         }
 
-        var major = db.Majors.FirstOrDefault(item => item.MajorID == majorID);
-        if (major is null)
+        public IActionResult LearnerByMajorID(int mid)
         {
-            ModelState.AddModelError(nameof(majorID), "Select a valid major.");
+            var learner = db.Learners.Where(l => l.MajorID == mid).Include(m => m.Major).ToList();
+            return PartialView("LearnerTable", learner);
         }
 
-        if (!ModelState.IsValid || major is null)
+        public IActionResult Create()
         {
-            ViewBag.MajorID = new SelectList(db.Majors, "MajorID", "MajorName", majorID);
-            return View(original);
+            ViewBag.MajorID = new SelectList(db.Majors,"MajorID","MajorName");
+            return View();
         }
 
-        var updated = new Learner(id, firstMidName.Trim(), lastName.Trim(), major, enrollmentDate);
-        if (!db.Update(updated, original))
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create([Bind("FirstMidName,LastName,MajorID,EnrollmentDate")] Learner learner)
         {
-            return Conflict();
+            if (ModelState.IsValid)
+            {
+                db.Learners.Add(learner);
+                db.SaveChanges();
+                return RedirectToAction(nameof(Index));
+            }
+            ViewBag.MajorID = new SelectList(db.Majors,"MajorID","MajorName");
+            return View();
         }
 
-        return RedirectToAction(nameof(Index));
-    }
-
-    [HttpGet]
-    public IActionResult Delete(int id)
-    {
-        var learner = db.Find(id);
-        return learner is null ? NotFound() : View(learner);
-    }
-
-    [HttpPost, ActionName(nameof(Delete))]
-    [ValidateAntiForgeryToken]
-    public IActionResult DeleteConfirmed(int id)
-    {
-        return db.Delete(id) ? RedirectToAction(nameof(Index)) : NotFound();
-    }
-
-    private IReadOnlyList<Learner> GetLearnerPage(int? mid, string? keyword, int? pageIndex)
-    {
-        IEnumerable<Learner> learners = db.Learners;
-        keyword = keyword?.Trim();
-
-        if (mid.HasValue)
+        public IActionResult Edit(int id)
         {
-            learners = learners.Where(learner => learner.MajorID == mid.Value);
+            if (id == null || db.Learners == null)
+            {
+                return NotFound();
+            }
+
+            var learner = db.Learners.Find(id);
+            if (learner == null)
+            {
+                return NotFound();
+            }
+            ViewBag.MajorID = new SelectList(db.Majors, "MajorID", "MajorName", learner.MajorID);
+            return View(learner);
         }
 
-        if (!string.IsNullOrEmpty(keyword))
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, [Bind("LearnerID,FirstMidName,LastName,MajorID,EnrollmentDate")] Learner learner)
         {
-            learners = learners.Where(learner =>
-                learner.FirstMidName.Contains(keyword, StringComparison.OrdinalIgnoreCase));
+            if (id != learner.LearnerID)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    db.Update(learner);
+                    db.SaveChanges();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!LearnerExists(learner.LearnerID))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            ViewBag.MajorID = new SelectList(db.Majors, "MajorID", "MajorName", learner.MajorID);
+            return View(learner);
         }
 
-        var results = learners.OrderBy(learner => learner.LearnerID).ToList();
-        int pageCount = (int)Math.Ceiling(results.Count / (double)PageSize);
-        int page = Math.Clamp(pageIndex ?? 1, 1, Math.Max(1, pageCount));
+        private bool LearnerExists(int id)
+        {
+            return (db.Learners?.Any(e => e.LearnerID == id)).GetValueOrDefault();
+        }
 
-        ViewBag.PageCount = pageCount;
-        ViewBag.PageIndex = page;
-        ViewBag.Mid = mid;
-        ViewBag.Keyword = keyword;
+        public IActionResult Delete(int id)
+        {
+            if (id == null || db.Learners == null)
+            {
+                return NotFound();
+            }
 
-        return results.Skip((page - 1) * PageSize).Take(PageSize).ToList();
+            var learner = db.Learners.Include(l => l.Major).Include(e => e.Enrollments).FirstOrDefault(m => m.LearnerID == id);
+            if (learner == null)
+            {
+                return NotFound();
+            }
+            if(learner.Enrollments.Count() > 0)
+            {
+                return Content("This learner has some enrollments, can't delete!");
+            }
+            return View(learner);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            if (db.Learners == null)
+            {
+                return Problem("Entity set 'Learners' is null");
+            }
+            var learner = db.Learners.Find(id);
+            if (learner != null)
+            {
+                db.Learners.Remove(learner);
+            }
+
+            db.SaveChanges();
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
-
