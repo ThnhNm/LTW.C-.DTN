@@ -10,18 +10,18 @@ namespace Lab4
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddDbContext<SchoolContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("SchoolContext")));
+            builder.Services.AddDbContext<SchoolContext>(options => options
+            .UseSqlServer(builder.Configuration.GetConnectionString("SchoolContext")));
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
 
-            using (var scope = app.Services.CreateScope())
+            using(var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
-                DbInitializer.Initialize(services);
+                DbInitalizer.Initialize(services);
             }
 
             // Configure the HTTP request pipeline.
@@ -33,6 +33,7 @@ namespace Lab4
             }
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
             app.UseRouting();
 
             app.UseAuthorization();

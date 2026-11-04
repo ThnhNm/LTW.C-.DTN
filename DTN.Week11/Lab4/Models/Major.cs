@@ -1,13 +1,12 @@
-namespace Lab4.Models
+﻿namespace Lab4.Models
 {
     public class Major
     {
-        public Major()
-        {
-            Learners = new HashSet<Learner>();
+        public Major() {
+            Learners = new HashSet<Learner>(); 
         }
         public int MajorID { get; set; }
-        public string MajorName { get; set; } = string.Empty;
+        public string MajorName { get; set; }
         public virtual ICollection<Learner> Learners { get; set; }
     }
 }

@@ -1,4 +1,3 @@
 <Solution>
   <Project Path="Lab4.csproj" />
-  <Project Path="DBFirstApp/DBFirstApp.csproj" />
 </Solution>

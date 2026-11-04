@@ -1,4 +1,4 @@
-namespace Lab4.Models
+﻿namespace Lab4.Models
 {
     public class Enrollment
     {
