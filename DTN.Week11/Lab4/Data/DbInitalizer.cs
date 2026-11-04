@@ -52,7 +52,7 @@ namespace Lab4.Data
                     new Enrollment{LearnerID=1, CourseID=1050,Grade=5.5f},
                     new Enrollment{LearnerID=1, CourseID=4022,Grade=7.5f},
                     new Enrollment{LearnerID=2, CourseID=1050,Grade=3.5f},
-                    new Enrollment{LearnerID=2, CourseID=4041,Grade=7f}
+                    new Enrollment{LearnerID=2, CourseID=4021,Grade=7f}
                 };
                 foreach (Enrollment e in enrollments)
                 {
