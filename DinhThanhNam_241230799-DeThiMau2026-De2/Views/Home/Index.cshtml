@@ -1,0 +1,10 @@
+﻿@model IEnumerable<TaiSan>
+@{
+    ViewData["Title"] = "Home Page";
+    Layout = "DinhThanhNam_Layout";
+}
+<div class="banner"><img src="~/images/banner.jpg" alt="Banner" /></div>
+
+<div id="noidung">
+    <partial name="DinhThanhNam_MainContent" model="Model" />
+</div>

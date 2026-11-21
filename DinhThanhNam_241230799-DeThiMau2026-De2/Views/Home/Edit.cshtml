@@ -1,0 +1,46 @@
+﻿@model DinhThanhNam_241230799_DeThiMau2026_De2.Models.TaiSan
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "DinhThanhNam_Layout";
+}
+
+<div class="section-head">
+    <h3>Sửa tài sản</h3>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="MaTs" />
+            <div class="form-group">
+                <label asp-for="MaLoai" class="control-label">Loại tài sản</label>
+                <select asp-for="MaLoai" class="form-control" asp-items="ViewBag.DsLoai"></select>
+                <span asp-validation-for="MaLoai" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TenTs" class="control-label">Tên tài sản</label>
+                <input asp-for="TenTs" class="form-control" />
+                <span asp-validation-for="TenTs" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NguyenGia" class="control-label">Nguyên giá (triệu)</label>
+                <input asp-for="NguyenGia" class="form-control" />
+                <span asp-validation-for="NguyenGia" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Anh" class="control-label">Tên file ảnh</label>
+                <input asp-for="Anh" class="form-control" />
+                <span asp-validation-for="Anh" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-buy" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
