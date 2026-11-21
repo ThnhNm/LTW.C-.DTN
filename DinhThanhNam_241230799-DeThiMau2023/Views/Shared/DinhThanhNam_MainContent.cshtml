@@ -1,0 +1,39 @@
+﻿@model IEnumerable<HangHoa>
+@{
+	var ds = Model.ToList();
+}
+<div class="content_top">
+	<div class="heading">
+		<h3>@ViewBag.TieuDe</h3>
+	</div>
+	<div class="see">
+		<p><a href="#">See all Products</a></p>
+	</div>
+	<div class="clear"></div>
+</div>
+
+
+@for (int i=0;i< ds.Count;i += 4)
+{
+	<div class="section group">
+		@foreach (var h in ds.Skip(i).Take(4))
+		{
+			<div class="grid_1_of_4 images_1_of_4">
+				<a href="#"><img src="~/images/@h.Anh" alt="@h.TenHang" /></a>
+				<h2>@h.TenHang</h2>
+				<div class="price-details">
+					<div class="price-number">
+						<p><span class="rupees">@h.Gia</span></p>
+					</div>
+					<div class="add-cart">
+						<h4><a href="#">Add to Cart</a></h4>
+					</div>
+					<div class="clear"></div>
+				</div>
+			</div>
+		}
+	</div>
+}
+
+
+

@@ -1,0 +1,39 @@
+﻿@model HangHoa
+@{
+	ViewData["Title"] = "Thêm hàng hóa";
+	Layout = "DinhThanhNam_Layout";
+}
+
+
+<div class="content_top">
+	<div class="heading">
+		<h3>Đinh Thành Nam - Thêm hàng hóa</h3>
+	</div>
+	<div class="see">
+		<p><a href="#">See all Products</a></p>
+	</div>
+	<div class="clear"></div>
+</div>
+
+<form asp-action="Create" method="post">
+	<div>
+		<label>MaLoai</label>
+		<select asp-for="MaLoai" asp-items="ViewBag.DsLoai"></select>
+	</div>
+	<div>
+		<label>TenHang</label>
+		<input asp-for="TenHang"/>
+		<span asp-validation-for="TenHang" class="text-danger"></span>
+	</div>
+	<div>
+		<label>Gia</label>
+		<input asp-for="Gia" />
+		<span asp-validation-for="Gia" class="text-danger"></span>
+	</div>
+	<div>
+		<label>Anh</label>
+		<input asp-for="Anh" />
+		<span asp-validation-for="Anh" class="text-danger"></span>
+	</div>
+	<button type="submit">Create</button>
+</form>
